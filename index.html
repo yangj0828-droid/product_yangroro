@@ -40,6 +40,31 @@
         .v-bar { width: 1.5px; background: #fff; opacity: 0.2; animation: move 0.6s infinite alternate; }
         @keyframes move { from { height: 2px; } to { height: 40px; } }
 
+        /* 제휴 문의 폼 */
+        .contact-section { padding: 120px 0 60px; border-top: 1px solid rgba(255,255,255,0.08); }
+        .contact-label { font-size: 9px; letter-spacing: 12px; opacity: 0.35; margin-bottom: 60px; text-transform: uppercase; }
+        .contact-form { max-width: 600px; display: flex; flex-direction: column; gap: 0; }
+        .contact-form input,
+        .contact-form textarea {
+            background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.15);
+            color: var(--fg); font-family: 'Times New Roman', serif; font-size: 0.95rem;
+            padding: 20px 0; outline: none; width: 100%; resize: none;
+            transition: border-color 0.3s;
+        }
+        .contact-form input::placeholder,
+        .contact-form textarea::placeholder { color: rgba(255,255,255,0.2); font-style: italic; }
+        .contact-form input:focus,
+        .contact-form textarea:focus { border-bottom-color: rgba(255,255,255,0.6); }
+        .contact-form textarea { min-height: 120px; margin-top: 10px; }
+        .contact-form button {
+            margin-top: 40px; background: transparent; border: 1px solid rgba(255,255,255,0.25);
+            color: var(--fg); font-family: 'Times New Roman', serif; font-size: 9px;
+            letter-spacing: 10px; padding: 18px 40px; cursor: pointer; align-self: flex-start;
+            text-transform: uppercase; transition: all 0.4s;
+        }
+        .contact-form button:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.6); }
+        .form-success { display: none; font-size: 9px; letter-spacing: 8px; opacity: 0.4; margin-top: 30px; text-transform: uppercase; }
+
         footer { padding: 100px; text-align: center; font-size: 9px; letter-spacing: 10px; opacity: 0.2; }
     </style>
 </head>
@@ -65,6 +90,30 @@
             </div>
         </div>
     </div>
+    <div class="container">
+        <div class="contact-section">
+            <div class="contact-label">P A R T N E R S H I P _ I N Q U I R Y</div>
+            <form class="contact-form" action="https://formspree.io/f/mgolrpry" method="POST" id="contactForm">
+                <input type="text" name="name" placeholder="NAME" required>
+                <input type="email" name="email" placeholder="EMAIL" required>
+                <input type="text" name="company" placeholder="COMPANY / BRAND">
+                <textarea name="message" placeholder="MESSAGE" required></textarea>
+                <button type="submit">S E N D</button>
+            </form>
+            <div class="form-success" id="formSuccess">M E S S A G E _ S E N T</div>
+        </div>
+    </div>
     <footer>E D I T I O N _ 2 0 2 6</footer>
+    <script>
+        const form = document.getElementById('contactForm');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const res = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
+            if (res.ok) {
+                form.style.display = 'none';
+                document.getElementById('formSuccess').style.display = 'block';
+            }
+        });
+    </script>
 </body>
 </html>
