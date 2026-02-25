@@ -4,106 +4,421 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>M G Z N _ A R C H I V E</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #0a0a0a; --fg: #dcdcdc; }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: var(--bg); color: var(--fg); font-family: 'Times New Roman', serif; overflow-x: hidden; position: relative; }
-
-        /* 필름 입자 효과 */
-        body::after {
-            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
-            opacity: 0.15; pointer-events: none; z-index: 1000;
+        :root {
+            --bg: #06000f;
+            --pink: #ff2d78;
+            --cyan: #00f5ff;
+            --purple: #9b00ff;
+            --fg: #f0dcff;
         }
 
-        nav { padding: 60px; text-align: left; }
-        .logo { font-size: 0.8rem; letter-spacing: 15px; opacity: 0.4; font-weight: 100; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        .container { max-width: 1400px; margin: 0 auto; padding: 0 50px 150px; }
-        .magazine-layout { display: flex; flex-direction: column; gap: 200px; }
-        
-        .row { display: flex; gap: 60px; align-items: center; justify-content: center; }
+        body {
+            background: var(--bg);
+            color: var(--fg);
+            font-family: 'VT323', monospace;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 격자 배경 */
+        body::before {
+            content: "";
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image:
+                linear-gradient(rgba(155, 0, 255, 0.07) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(155, 0, 255, 0.07) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none; z-index: 0;
+        }
+
+        /* CRT 스캔라인 */
+        body::after {
+            content: "";
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent, transparent 3px,
+                rgba(0, 0, 0, 0.12) 3px, rgba(0, 0, 0, 0.12) 4px
+            );
+            pointer-events: none; z-index: 1001;
+        }
+
+        /* CRT 비네팅 */
+        .vignette {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.8) 100%);
+            pointer-events: none; z-index: 1000;
+        }
+
+        /* 원근감 있는 그리드 (하단) */
+        .grid-perspective {
+            width: 100%;
+            height: 280px;
+            position: relative;
+            overflow: hidden;
+            margin: 60px 0 0;
+        }
+        .grid-perspective svg {
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 100%; height: 100%;
+        }
+
+        /* 네비게이션 */
+        nav {
+            padding: 40px 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--pink);
+            box-shadow: 0 0 30px rgba(255, 45, 120, 0.4);
+            position: relative; z-index: 10;
+        }
+        .logo {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.95rem;
+            letter-spacing: 6px;
+            color: var(--pink);
+            text-shadow: 0 0 10px var(--pink), 0 0 30px var(--pink), 0 0 70px rgba(255,45,120,0.6);
+            animation: flicker 6s infinite;
+        }
+        .nav-year {
+            font-family: 'VT323', monospace;
+            font-size: 1.1rem;
+            letter-spacing: 8px;
+            color: var(--cyan);
+            text-shadow: 0 0 10px var(--cyan);
+            opacity: 0.7;
+        }
+
+        @keyframes flicker {
+            0%, 95%, 100% { opacity: 1; }
+            96% { opacity: 0.4; }
+            97% { opacity: 1; }
+            98% { opacity: 0.2; }
+            99% { opacity: 1; }
+        }
+
+        /* 히어로 태그라인 */
+        .hero-text {
+            text-align: center;
+            padding: 80px 60px 40px;
+            position: relative; z-index: 10;
+        }
+        .hero-text h1 {
+            font-family: 'Press Start 2P', monospace;
+            font-size: clamp(1rem, 3vw, 2rem);
+            letter-spacing: 6px;
+            line-height: 2;
+            color: var(--cyan);
+            text-shadow: 0 0 15px var(--cyan), 0 0 40px rgba(0,245,255,0.5);
+        }
+        .hero-sub {
+            margin-top: 20px;
+            font-size: 1.3rem;
+            letter-spacing: 10px;
+            color: var(--fg);
+            opacity: 0.5;
+        }
+
+        /* 메인 레이아웃 */
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 50px 100px; position: relative; z-index: 10; }
+        .magazine-layout { display: flex; flex-direction: column; gap: 100px; padding-top: 60px; }
+
+        .row { display: flex; gap: 50px; align-items: center; justify-content: center; }
         .row.reverse { flex-direction: row-reverse; }
 
-        .photo-frame { position: relative; overflow: hidden; background: #111; width: 100%; }
+        /* 사진 프레임 */
+        .photo-frame {
+            position: relative;
+            overflow: hidden;
+            background: #0a0018;
+            border: 1px solid var(--cyan);
+            box-shadow: 0 0 20px rgba(0,245,255,0.3), 0 0 60px rgba(0,245,255,0.1), inset 0 0 30px rgba(0,0,0,0.5);
+        }
+        .photo-frame.pink-border {
+            border-color: var(--pink);
+            box-shadow: 0 0 20px rgba(255,45,120,0.3), 0 0 60px rgba(255,45,120,0.1), inset 0 0 30px rgba(0,0,0,0.5);
+        }
         .large { width: 65%; aspect-ratio: 16 / 10; }
         .portrait { width: 35%; aspect-ratio: 4 / 6; }
-        
-        img { 
-            width: 100%; height: 100%; object-fit: cover; 
-            filter: sepia(30%) contrast(1.1) brightness(0.8) saturate(0.7);
-            transition: 1.5s ease;
-        }
-        .photo-frame:hover img { filter: sepia(0%) contrast(1) brightness(1) saturate(1); transform: scale(1.03); }
 
-        .visual-bars { display: flex; justify-content: center; align-items: flex-end; gap: 5px; height: 40px; margin: 100px 0; }
-        .v-bar { width: 1.5px; background: #fff; opacity: 0.2; animation: move 0.6s infinite alternate; }
-        @keyframes move { from { height: 2px; } to { height: 40px; } }
+        img {
+            width: 100%; height: 100%; object-fit: cover;
+            filter: hue-rotate(260deg) saturate(1.8) contrast(1.2) brightness(0.7);
+            transition: 1.2s ease;
+        }
+        .photo-frame:hover img {
+            filter: hue-rotate(300deg) saturate(2.2) contrast(1.1) brightness(0.9);
+            transform: scale(1.04);
+        }
+        .photo-frame::after {
+            content: "";
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, rgba(255,45,120,0.12) 0%, transparent 40%, rgba(0,245,255,0.12) 100%);
+            pointer-events: none;
+        }
+
+        /* 코너 장식 */
+        .photo-frame::before {
+            content: "";
+            position: absolute; top: 8px; left: 8px; right: 8px; bottom: 8px;
+            border: 1px solid rgba(255,255,255,0.05);
+            pointer-events: none; z-index: 2;
+        }
+
+        /* 이퀄라이저 바 */
+        .visual-bars {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 3px;
+            height: 70px;
+            margin: 20px 0;
+        }
+        .v-bar {
+            width: 4px;
+            border-radius: 1px;
+            animation: eq 0.35s infinite alternate;
+        }
+        .v-bar:nth-child(odd) {
+            background: var(--pink);
+            box-shadow: 0 0 8px var(--pink);
+        }
+        .v-bar:nth-child(even) {
+            background: var(--cyan);
+            box-shadow: 0 0 8px var(--cyan);
+        }
+        @keyframes eq { from { height: 4px; opacity: 0.3; } to { height: 70px; opacity: 1; } }
+
+        /* 구분선 텍스트 */
+        .divider-text {
+            text-align: center;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.5rem;
+            letter-spacing: 8px;
+            color: var(--purple);
+            text-shadow: 0 0 10px var(--purple);
+            padding: 10px 0;
+            opacity: 0.8;
+        }
 
         /* 제휴 문의 폼 */
-        .contact-section { padding: 120px 0 60px; border-top: 1px solid rgba(255,255,255,0.08); }
-        .contact-label { font-size: 9px; letter-spacing: 12px; opacity: 0.35; margin-bottom: 60px; text-transform: uppercase; }
-        .contact-form { max-width: 600px; display: flex; flex-direction: column; gap: 0; }
+        .contact-section {
+            padding: 100px 0 60px;
+            border-top: 1px solid rgba(255,45,120,0.3);
+            position: relative;
+        }
+        .contact-section::before {
+            content: "▓▒░ INPUT ░▒▓";
+            position: absolute;
+            top: -12px; left: 0;
+            font-family: 'VT323', monospace;
+            font-size: 1rem;
+            letter-spacing: 4px;
+            color: var(--pink);
+            text-shadow: 0 0 10px var(--pink);
+            background: var(--bg);
+            padding: 0 16px;
+        }
+        .contact-label {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 4px;
+            color: var(--cyan);
+            text-shadow: 0 0 10px var(--cyan), 0 0 25px rgba(0,245,255,0.5);
+            margin-bottom: 50px;
+            line-height: 2;
+        }
+        .contact-form { max-width: 600px; display: flex; flex-direction: column; }
         .contact-form input,
         .contact-form textarea {
-            background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.15);
-            color: var(--fg); font-family: 'Times New Roman', serif; font-size: 0.95rem;
-            padding: 20px 0; outline: none; width: 100%; resize: none;
-            transition: border-color 0.3s;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(155,0,255,0.4);
+            color: var(--fg);
+            font-family: 'VT323', monospace;
+            font-size: 1.4rem;
+            letter-spacing: 4px;
+            padding: 18px 0;
+            outline: none;
+            width: 100%;
+            resize: none;
+            transition: border-color 0.3s, text-shadow 0.3s;
         }
         .contact-form input::placeholder,
-        .contact-form textarea::placeholder { color: rgba(255,255,255,0.2); font-style: italic; }
-        .contact-form input:focus,
-        .contact-form textarea:focus { border-bottom-color: rgba(255,255,255,0.6); }
-        .contact-form textarea { min-height: 120px; margin-top: 10px; }
-        .contact-form button {
-            margin-top: 40px; background: transparent; border: 1px solid rgba(255,255,255,0.25);
-            color: var(--fg); font-family: 'Times New Roman', serif; font-size: 9px;
-            letter-spacing: 10px; padding: 18px 40px; cursor: pointer; align-self: flex-start;
-            text-transform: uppercase; transition: all 0.4s;
+        .contact-form textarea::placeholder {
+            color: rgba(155, 0, 255, 0.5);
         }
-        .contact-form button:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.6); }
-        .form-success { display: none; font-size: 9px; letter-spacing: 8px; opacity: 0.4; margin-top: 30px; text-transform: uppercase; }
+        .contact-form input:focus,
+        .contact-form textarea:focus {
+            border-bottom-color: var(--pink);
+            text-shadow: 0 0 8px rgba(255,45,120,0.5);
+            caret-color: var(--pink);
+        }
+        .contact-form textarea { min-height: 110px; margin-top: 10px; }
+        .contact-form button {
+            margin-top: 40px;
+            background: transparent;
+            border: 1px solid var(--pink);
+            color: var(--pink);
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 6px;
+            padding: 16px 40px;
+            cursor: pointer;
+            align-self: flex-start;
+            text-shadow: 0 0 10px var(--pink);
+            box-shadow: 0 0 20px rgba(255,45,120,0.3), inset 0 0 20px rgba(255,45,120,0.05);
+            transition: all 0.25s;
+            position: relative;
+            overflow: hidden;
+        }
+        .contact-form button:hover {
+            background: rgba(255,45,120,0.12);
+            box-shadow: 0 0 35px rgba(255,45,120,0.6), inset 0 0 35px rgba(255,45,120,0.1);
+            letter-spacing: 8px;
+        }
+        .form-success {
+            display: none;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 4px;
+            color: var(--cyan);
+            text-shadow: 0 0 15px var(--cyan);
+            margin-top: 30px;
+            line-height: 2.5;
+            animation: flicker 3s infinite;
+        }
 
-        footer { padding: 100px; text-align: center; font-size: 9px; letter-spacing: 10px; opacity: 0.2; }
+        /* 원근 그리드 */
+        footer {
+            padding: 60px;
+            text-align: center;
+            font-family: 'VT323', monospace;
+            font-size: 1rem;
+            letter-spacing: 10px;
+            color: var(--pink);
+            opacity: 0.5;
+            border-top: 1px solid rgba(255,45,120,0.2);
+            position: relative; z-index: 10;
+        }
     </style>
 </head>
 <body>
-    <nav><div class="logo">M G Z N _ A R C H I V E</div></nav>
+    <div class="vignette"></div>
+
+    <nav>
+        <div class="logo">M G Z N _ A R C H I V E</div>
+        <div class="nav-year">1 9 8 0 — 2 0 2 6</div>
+    </nav>
+
+    <div class="hero-text">
+        <h1>THE FUTURE<br>IS NOW</h1>
+        <div class="hero-sub">E D I T I O N _ V O L . 0 1</div>
+    </div>
+
     <div class="container">
         <div class="magazine-layout">
+
             <div class="row">
                 <div class="photo-frame large">
                     <img src="https://images.unsplash.com/photo-1542204172-3c2415d881a9?auto=format&fit=crop&q=80&w=1600" alt="Night Mood">
                 </div>
             </div>
+
             <div class="visual-bars">
-                <div class="v-bar" style="animation-delay: 0.1s"></div>
-                <div class="v-bar" style="animation-delay: 0.3s"></div>
-                <div class="v-bar" style="animation-delay: 0.2s"></div>
-                <div class="v-bar" style="animation-delay: 0.4s"></div>
+                <div class="v-bar" style="animation-delay:0.00s"></div>
+                <div class="v-bar" style="animation-delay:0.05s"></div>
+                <div class="v-bar" style="animation-delay:0.10s"></div>
+                <div class="v-bar" style="animation-delay:0.15s"></div>
+                <div class="v-bar" style="animation-delay:0.20s"></div>
+                <div class="v-bar" style="animation-delay:0.25s"></div>
+                <div class="v-bar" style="animation-delay:0.30s"></div>
+                <div class="v-bar" style="animation-delay:0.35s"></div>
+                <div class="v-bar" style="animation-delay:0.40s"></div>
+                <div class="v-bar" style="animation-delay:0.45s"></div>
+                <div class="v-bar" style="animation-delay:0.50s"></div>
+                <div class="v-bar" style="animation-delay:0.55s"></div>
+                <div class="v-bar" style="animation-delay:0.35s"></div>
+                <div class="v-bar" style="animation-delay:0.25s"></div>
+                <div class="v-bar" style="animation-delay:0.15s"></div>
+                <div class="v-bar" style="animation-delay:0.05s"></div>
             </div>
+
+            <div class="divider-text">◈ — ◈ — ◈ — ◈</div>
+
             <div class="row reverse">
-                <div class="photo-frame portrait">
+                <div class="photo-frame portrait pink-border">
                     <img src="https://images.unsplash.com/photo-1533104816931-20fa691ff6ca?auto=format&fit=crop&q=80&w=1200" alt="Minimal">
                 </div>
             </div>
+
         </div>
     </div>
+
+    <!-- 원근감 그리드 -->
+    <div class="grid-perspective">
+        <svg viewBox="0 0 1200 280" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="gridFade" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#06000f" stop-opacity="1"/>
+                    <stop offset="40%" stop-color="#06000f" stop-opacity="0"/>
+                    <stop offset="100%" stop-color="#06000f" stop-opacity="0"/>
+                </linearGradient>
+                <linearGradient id="linePink" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stop-color="rgba(255,45,120,0)"/>
+                    <stop offset="50%" stop-color="rgba(255,45,120,0.7)"/>
+                    <stop offset="100%" stop-color="rgba(255,45,120,0)"/>
+                </linearGradient>
+            </defs>
+            <!-- 수평선들 -->
+            <line x1="0" y1="280" x2="1200" y2="280" stroke="rgba(255,45,120,0.8)" stroke-width="1.5"/>
+            <line x1="100" y1="220" x2="1100" y2="220" stroke="rgba(255,45,120,0.6)" stroke-width="1"/>
+            <line x1="220" y1="170" x2="980" y2="170" stroke="rgba(255,45,120,0.4)" stroke-width="0.8"/>
+            <line x1="320" y1="130" x2="880" y2="130" stroke="rgba(255,45,120,0.3)" stroke-width="0.6"/>
+            <line x1="400" y1="100" x2="800" y2="100" stroke="rgba(255,45,120,0.2)" stroke-width="0.5"/>
+            <line x1="460" y1="78" x2="740" y2="78" stroke="rgba(255,45,120,0.15)" stroke-width="0.4"/>
+            <!-- 수직선들 (소실점 방향) -->
+            <line x1="600" y1="60" x2="0" y2="280" stroke="rgba(0,245,255,0.3)" stroke-width="0.8"/>
+            <line x1="600" y1="60" x2="120" y2="280" stroke="rgba(0,245,255,0.25)" stroke-width="0.7"/>
+            <line x1="600" y1="60" x2="240" y2="280" stroke="rgba(0,245,255,0.2)" stroke-width="0.6"/>
+            <line x1="600" y1="60" x2="360" y2="280" stroke="rgba(0,245,255,0.2)" stroke-width="0.6"/>
+            <line x1="600" y1="60" x2="480" y2="280" stroke="rgba(0,245,255,0.15)" stroke-width="0.5"/>
+            <line x1="600" y1="60" x2="600" y2="280" stroke="rgba(0,245,255,0.35)" stroke-width="1"/>
+            <line x1="600" y1="60" x2="720" y2="280" stroke="rgba(0,245,255,0.15)" stroke-width="0.5"/>
+            <line x1="600" y1="60" x2="840" y2="280" stroke="rgba(0,245,255,0.2)" stroke-width="0.6"/>
+            <line x1="600" y1="60" x2="960" y2="280" stroke="rgba(0,245,255,0.2)" stroke-width="0.6"/>
+            <line x1="600" y1="60" x2="1080" y2="280" stroke="rgba(0,245,255,0.25)" stroke-width="0.7"/>
+            <line x1="600" y1="60" x2="1200" y2="280" stroke="rgba(0,245,255,0.3)" stroke-width="0.8"/>
+            <!-- 페이드 오버레이 -->
+            <rect x="0" y="0" width="1200" height="280" fill="url(#gridFade)"/>
+        </svg>
+    </div>
+
     <div class="container">
         <div class="contact-section">
-            <div class="contact-label">P A R T N E R S H I P _ I N Q U I R Y</div>
+            <div class="contact-label">P A R T N E R S H I P<br>_ I N Q U I R Y</div>
             <form class="contact-form" action="https://formspree.io/f/mgolrpry" method="POST" id="contactForm">
-                <input type="text" name="name" placeholder="NAME" required>
-                <input type="email" name="email" placeholder="EMAIL" required>
-                <input type="text" name="company" placeholder="COMPANY / BRAND">
-                <textarea name="message" placeholder="MESSAGE" required></textarea>
-                <button type="submit">S E N D</button>
+                <input type="text" name="name" placeholder="▸ NAME" required>
+                <input type="email" name="email" placeholder="▸ EMAIL" required>
+                <input type="text" name="company" placeholder="▸ COMPANY / BRAND">
+                <textarea name="message" placeholder="▸ MESSAGE" required></textarea>
+                <button type="submit">► S E N D</button>
             </form>
-            <div class="form-success" id="formSuccess">M E S S A G E _ S E N T</div>
+            <div class="form-success" id="formSuccess">✦ MESSAGE_SENT ✦<br>TRANSMISSION COMPLETE</div>
         </div>
     </div>
-    <footer>E D I T I O N _ 2 0 2 6</footer>
+
+    <footer>E D I T I O N _ 2 0 2 6 &nbsp;|&nbsp; M G Z N _ A R C H I V E</footer>
+
     <script>
         const form = document.getElementById('contactForm');
         form.addEventListener('submit', async (e) => {
